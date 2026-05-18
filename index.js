@@ -12,7 +12,6 @@ const PORT = process.env.PORT
 app.use(express.json()) ;
 
 
-
 // mongodb collection
 const client = new MongoClient(uri, {
   serverApi: {
@@ -22,13 +21,30 @@ const client = new MongoClient(uri, {
   }
 });
 
+
+// database aikane create o aikane tke collection korte hobe
  async function run() {
   try {
     await client.connect();
+    // my first db 
+    const db = client.db('sports-nest')
+    const facilityCollection = db.collection('facility')
 
-    // make db
+    // fronted teke data anar jonno post api call korte hoi
+
+    app.post('/facility', async (req,res) =>{
+           const facilityData = req.body
+         const result = await facilityCollection.insertOne(facilityData)
+         res.json(result)
+    })
+
+
+
+
+
+
+
     await client.db("admin").command({ ping: 1 });
-
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } catch (error) {
     console.dir(error);
@@ -37,9 +53,7 @@ const client = new MongoClient(uri, {
 
 run();
 
-
-// api make start blew 
-
+// server running get api
 app.get('/',(req,res) => {
   res.send(`server is running fine !`)
 })
