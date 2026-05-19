@@ -1,7 +1,7 @@
 const express = require('express')
 const dotenv =  require('dotenv')
 const cors = require('cors')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 dotenv.config() 
 
 const app = express() ;
@@ -31,13 +31,46 @@ const client = new MongoClient(uri, {
     const facilityCollection = db.collection('facility')
 
     // fronted teke data anar jonno post api call korte hoi
-
     app.post('/facility', async (req,res) =>{
-           const facilityData = req.body
+        const facilityData = req.body
          const result = await facilityCollection.insertOne(facilityData)
          res.json(result)
+         
     })
 
+    // get api to send data mongodb to frontend
+   app.get('/facility', async(req,res)=>{
+    const result = await facilityCollection.find().toArray()
+    res.json(result)
+   })
+
+  // dianamic id sent and receive fronted
+  app.get('/facility/:id' , async(req,res) =>{
+      const {id}  = req.params ;
+      const result = await facilityCollection.findOne({_id:new ObjectId(id)})
+      res.send(result) 
+  })
+
+  // edit my details id 
+app.patch('/facility/:id', async (req, res) => {
+    const {id} =  req.params;
+    const updateData = req.body
+    const result= await  facilityCollection.updateOne(
+      {_id:new ObjectId(id)},
+      {$set:updateData}
+    )
+      
+    res.json(result)
+    
+  })
+
+
+
+  //  get api to feature show in fronted
+  app.get('/features', async(req,res) =>{
+    const result = await facilityCollection.find().limit(4).toArray()
+    res.send(result)
+  })
 
 
 
