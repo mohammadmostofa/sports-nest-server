@@ -63,6 +63,21 @@ app.patch('/facility/:id', async (req, res) => {
     res.json(result)
     
   })
+  
+  //  delete fronted details
+app.delete('/facility/:id', async (req, res) => {
+       const {id} =  req.params;
+        const result= await  facilityCollection.deleteOne(
+      {_id:new ObjectId(id)},) 
+
+       if(result.deletedCount > 0){
+                return res.status(200).json({ success: true }); 
+         }  else 
+            { return res.status(404).json({ success: false, message: "Not Found" }); 
+         }
+  })
+
+
 
 
 
