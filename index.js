@@ -79,7 +79,7 @@ app.delete('/facility/:id', async (req, res) => {
 
   //  get api to feature show in fronted
   app.get('/features', async(req,res) =>{
-    const result = await facilityCollection.find().limit(4).toArray()
+    const result = await facilityCollection.find().limit(8).toArray()
     res.send(result)
   })
 
@@ -94,12 +94,26 @@ app.delete('/facility/:id', async (req, res) => {
   })
 
 // single data show by userid
-
+// mongod and get id  name same tai ekta itd disi 
 app.get('/booking/:user_id', async(req,res) =>{
     const {user_id} = req.params;
-    const result = await bookingCollection.find({user_id:user_id}).toArray()
+    const result = await bookingCollection.find({user_id}).toArray()
     res.json(result)
 })
+
+
+// delete
+
+app.delete('/booking/:id', async (req, res) =>{
+     const {id}  = req.params;
+     const result = await bookingCollection.deleteOne({
+       _id:new ObjectId(id)
+     })
+
+     res.json(result)
+})
+
+
 
 
 
