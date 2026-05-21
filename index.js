@@ -93,7 +93,13 @@ app.delete('/facility/:id', async (req, res) => {
       res.json(result)
   })
 
+// single data show by userid
 
+app.get('/booking/:user_id', async(req,res) =>{
+    const {user_id} = req.params;
+    const result = await bookingCollection.find({user_id:user_id}).toArray()
+    res.json(result)
+})
 
 
 
