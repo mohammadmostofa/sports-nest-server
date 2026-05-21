@@ -26,10 +26,10 @@ const client = new MongoClient(uri, {
  async function run() {
   try {
     await client.connect();
-    // my first db 
+    // collection database name
     const db = client.db('sports-nest')
     const facilityCollection = db.collection('facility')
-
+    const bookingCollection = db.collection('booking')
     // fronted teke data anar jonno post api call korte hoi
     app.post('/facility', async (req,res) =>{
         const facilityData = req.body
@@ -74,12 +74,8 @@ app.delete('/facility/:id', async (req, res) => {
                 return res.status(200).json({ success: true }); 
          }  else 
             { return res.status(404).json({ success: false, message: "Not Found" }); 
-         }
+       }
   })
-
-
-
-
 
   //  get api to feature show in fronted
   app.get('/features', async(req,res) =>{
@@ -87,6 +83,15 @@ app.delete('/facility/:id', async (req, res) => {
     res.send(result)
   })
 
+
+
+  // booking 
+
+  app.post('/booking', async (req,res)=>{
+      const bookingData = req.body;
+      const result = await bookingCollection.insertOne(bookingData);
+      res.json(result)
+  })
 
 
 
