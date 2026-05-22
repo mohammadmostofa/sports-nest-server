@@ -37,23 +37,26 @@ const verifyToken = async (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  const token = authHeader.split(" ")[1];
+    const token = authHeader.split(" ")[1]; 
 
-  if (!token) {
+
+    if (!token) {
     return res.status(401).json({ message: "Token missing" });
   }
 
+
   try {
+
     const { payload } = await jwtVerify(token, JWKS);
 
     console.log(payload, "payload");
 
     req.user = payload; // best practice
     next();
-
-  } catch (err) {
+    } catch (err) {
     return res.status(403).json({ message: "Forbidden" });
   }
+
 };
 
 
@@ -66,7 +69,7 @@ const verifyToken = async (req, res, next) => {
     const facilityCollection = db.collection('facility')
     const bookingCollection = db.collection('booking')
     // fronted teke data anar jonno post api call korte hoi
-    app.post('/facility', verifyToken, async (req,res) =>{
+    app.post('/facility',  async (req,res) =>{
         const facilityData = req.body
          const result = await facilityCollection.insertOne(facilityData)
          res.json(result)
@@ -121,7 +124,7 @@ app.delete('/facility/:id', async (req, res) => {
 
 
   // booking 
-  app.post('/booking', verifyToken, async (req,res)=>{
+  app.post('/booking', async (req,res)=>{
       const bookingData = req.body;
       const result = await bookingCollection.insertOne(bookingData);
       res.json(result)
