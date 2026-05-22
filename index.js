@@ -2,6 +2,7 @@ const express = require('express')
 const dotenv =  require('dotenv')
 const cors = require('cors')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { createRemoteJWKSet, jwtVerify } = require('jose-node-cjs-runtime');
 dotenv.config() 
 
 const app = express() ;
@@ -22,6 +23,40 @@ const client = new MongoClient(uri, {
 });
 
 
+
+// verify token
+
+    const JWKS = createRemoteJWKSet(
+      new URL('http://localhost:3000/api/auth/jwks')
+    )
+
+const verifyToken = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Token missing" });
+  }
+
+  try {
+    const { payload } = await jwtVerify(token, JWKS);
+
+    console.log(payload, "payload");
+
+    req.user = payload; // best practice
+    next();
+
+  } catch (err) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+};
+
+
 // database aikane create o aikane tke collection korte hobe
  async function run() {
   try {
@@ -31,7 +66,7 @@ const client = new MongoClient(uri, {
     const facilityCollection = db.collection('facility')
     const bookingCollection = db.collection('booking')
     // fronted teke data anar jonno post api call korte hoi
-    app.post('/facility', async (req,res) =>{
+    app.post('/facility',async (req,res) =>{
         const facilityData = req.body
          const result = await facilityCollection.insertOne(facilityData)
          res.json(result)
@@ -45,14 +80,14 @@ const client = new MongoClient(uri, {
    })
 
   // dianamic id sent and receive fronted
-  app.get('/facility/:id' , async(req,res) =>{
+  app.get('/facility/:id', verifyToken,  async(req,res) =>{
       const {id}  = req.params ;
       const result = await facilityCollection.findOne({_id:new ObjectId(id)})
       res.send(result) 
   })
 
   // edit my details id 
-app.patch('/facility/:id', async (req, res) => {
+app.patch('/facility/:id',  async (req, res) => {
     const {id} =  req.params;
     const updateData = req.body
     const result= await  facilityCollection.updateOne(
@@ -113,8 +148,19 @@ app.delete('/booking/:id', async (req, res) =>{
      res.json(result)
 })
 
+// update data or edit in booking 
 
+app.patch('/booking/:id', async (req,res) =>{
+  const {id} =  req.params;
+  const updateData = req.body;
+  const result = await bookingCollection.updateOne(
+    {_id:new ObjectId(id)},
+    {$set:updateData}
+  ) ;
 
+  res.json(result)
+
+})
 
 
     await client.db("admin").command({ ping: 1 });
