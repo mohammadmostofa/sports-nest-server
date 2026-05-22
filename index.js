@@ -2,14 +2,13 @@ const express = require('express')
 const dotenv =  require('dotenv')
 const cors = require('cors')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-// const { createRemoteJWKSet, jwtVerify } = require('jose-node-cjs-runtime');
 dotenv.config() 
 
 const app = express() ;
 const uri = process.env.MONGODB_URI ;
 app.use(cors()) ;
 const PORT = process.env.PORT 
-
+//express connect between server
 app.use(express.json()) ;
 
 
@@ -24,7 +23,6 @@ const client = new MongoClient(uri, {
 
 
 
-// verify token
 
 //     const JWKS = createRemoteJWKSet(
 //       new URL(`${process.env.CLIENT_URL}/api/auth/jwks`)
