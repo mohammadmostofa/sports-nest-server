@@ -27,7 +27,7 @@ const client = new MongoClient(uri, {
 // verify token
 
     const JWKS = createRemoteJWKSet(
-      new URL('http://localhost:3000/api/auth/jwks')
+      new URL(`${process.env.CLIENT_URL}/api/auth/jwks`)
     )
 
 const verifyToken = async (req, res, next) => {
@@ -60,13 +60,13 @@ const verifyToken = async (req, res, next) => {
 // database aikane create o aikane tke collection korte hobe
  async function run() {
   try {
-    await client.connect();
+    // await client.connect();
     // collection database name
     const db = client.db('sports-nest')
     const facilityCollection = db.collection('facility')
     const bookingCollection = db.collection('booking')
     // fronted teke data anar jonno post api call korte hoi
-    app.post('/facility',async (req,res) =>{
+    app.post('/facility', verifyToken, async (req,res) =>{
         const facilityData = req.body
          const result = await facilityCollection.insertOne(facilityData)
          res.json(result)
@@ -121,8 +121,7 @@ app.delete('/facility/:id', async (req, res) => {
 
 
   // booking 
-
-  app.post('/booking', async (req,res)=>{
+  app.post('/booking', verifyToken, async (req,res)=>{
       const bookingData = req.body;
       const result = await bookingCollection.insertOne(bookingData);
       res.json(result)
@@ -130,7 +129,7 @@ app.delete('/facility/:id', async (req, res) => {
 
 // single data show by userid
 // mongod and get id  name same tai ekta itd disi 
-app.get('/booking/:user_id', async(req,res) =>{
+app.get('/booking/:user_id',  async(req,res) =>{
     const {user_id} = req.params;
     const result = await bookingCollection.find({user_id}).toArray()
     res.json(result)
@@ -163,7 +162,7 @@ app.patch('/booking/:id', async (req,res) =>{
 })
 
 
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } catch (error) {
     console.dir(error);
