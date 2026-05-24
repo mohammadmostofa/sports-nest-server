@@ -24,7 +24,6 @@ const client = new MongoClient(uri, {
 
 
 
-//     const JWKS = createRemoteJWKSet(
 //       new URL(`${process.env.CLIENT_URL}/api/auth/jwks`)
 //     )
 
@@ -172,7 +171,7 @@ app.patch('/booking/:id', async (req,res) =>{
 
 run();
 
-// server running get api
+// server run.............
 app.get('/',(req,res) => {
   res.send(`server is running fine !`)
 })
